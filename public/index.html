@@ -134,4 +134,3 @@ loadDay('today');
 </body>
 </html>
 
-async function getAI(fix,odds,val){const home=fix.teams.home.name,away=fix.teams.away.name;const ot=odds?'Cotes: '+home+' '+odds.home+' / Nul '+odds.draw+' / '+away+' '+odds.away:'Cotes indisponibles';const vt=val?'Edge: '+val.best.edge.toFixed(1)+'% sur '+val.best.label:'';const prompt='Expert paris sportifs. 3 lignes max.\nMatch: '+home+' vs '+away+' ('+fix.league.name+')\n'+ot+'\n'+vt+'\nForme dom: '+(fix.teams.home.form||'N/A')+' ext: '+(fix.teams.away.form||'N/A')+'\nContexte + pari recommandé + risque. Direct.';try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:250,messages:[{role:'user',content:prompt}]})});const d=await r.json();return d.content?.[0]?.text||'Analyse indisponible.';}catch(e){return 'Analyse indisponible.';}}
