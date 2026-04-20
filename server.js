@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,10 +10,15 @@ const API_KEY = process.env.API_KEY || '';
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({ status: 'TipsterPRO Proxy actif', version: '1.0' });
+// Servir l'app HTML
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Health check
+app.get('/status', (req, res) => {
+  res.json({ status: 'TipsterPRO actif', version: '2.0' });
 });
 
+// Proxy API-Football
 app.get('/api/*', async (req, res) => {
   try {
     const endpoint = req.path.replace('/api', '');
@@ -31,5 +37,5 @@ app.get('/api/*', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Serveur TipsterPRO démarré sur le port ${PORT}`);
+  console.log(`TipsterPRO démarré sur le port ${PORT}`);
 });
