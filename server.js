@@ -13,7 +13,21 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/status', (req, res) => {
-  res.json({ status: 'TipsterPRO actif', version: '3.0' });
+  res.json({ status: 'TipsterPRO actif', version: '3.0', gemini: !!GEMINI_KEY });
+});
+
+// Test Gemini
+app.get('/ai-test', async (req, res) => {
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+    const response = await axios.post(url, {
+      contents: [{ parts: [{ text: 'Dis bonjour en français' }] }]
+    });
+    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'Vide';
+    res.json({ success: true, text, key_present: !!GEMINI_KEY });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message, key_present: !!GEMINI_KEY });
+  }
 });
 
 // Proxy API-Football
@@ -39,9 +53,7 @@ app.post('/ai', async (req, res) => {
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
     const response = await axios.post(url, {
-      contents: [{
-        parts: [{ text: req.body.prompt }]
-      }]
+      contents: [{ parts: [{ text: req.body.prompt }] }]
     });
     const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analyse indisponible.';
     res.json({ text });
