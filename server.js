@@ -37,7 +37,7 @@ app.get('/api/*', async (req, res) => {
 // Proxy Gemini IA
 app.post('/ai', async (req, res) => {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
     const response = await axios.post(url, {
       contents: [{
         parts: [{ text: req.body.prompt }]
