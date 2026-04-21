@@ -132,7 +132,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 
 <script>
 const LEAGUES={39:{name:'Premier League',flag:'EN'},61:{name:'Ligue 1',flag:'FR'},62:{name:'Ligue 2',flag:'FR'},140:{name:'La Liga',flag:'ES'},135:{name:'Serie A',flag:'IT'},78:{name:'Bundesliga',flag:'DE'},88:{name:'Eredivisie',flag:'NL'},141:{name:'Segunda',flag:'ES'},94:{name:'Primeira Liga',flag:'PT'},144:{name:'Pro League',flag:'BE'}};
-const state={today:{fixtures:[],odds:{},loaded:false},tomorrow:{fixtures:[],odds:{},loaded:false}};
+const state={today:{fixtures:[],odds:{},analyses:{},loaded:false},tomorrow:{fixtures:[],odds:{},analyses:{},loaded:false}};
 let currentDay='today',currentSection='all',expandedId=null;
 
 function getDate(o){o=o||0;var d=new Date();d.setDate(d.getDate()+o);return d.toISOString().split('T')[0];}
@@ -148,57 +148,87 @@ function showToast(msg){
 }
 
 function exportToExcel(){
-  var s=state[currentDay];
-  if(s.fixtures.length===0){showToast('Aucun match a exporter');return;}
-  var date=formatDate(currentDay==='tomorrow'?1:0);
+  var todayFixtures=state.today.fixtures;
+  var tomorrowFixtures=state.tomorrow.fixtures;
+  var allEmpty=todayFixtures.length===0&&tomorrowFixtures.length===0;
+  if(allEmpty){showToast('Aucun match a exporter');return;}
   var rows=[
     ['TipsterPRO - Journal de Paris'],
-    ['Date: '+date],
+    ['Exporte le: '+new Date().toLocaleDateString('fr-FR')],
     [],
-    ['Match','Ligue','Heure','Cote 1','Cote X','Cote 2','+1.5','+2.5','BTTS','Value','Edge %','Prob 1%','Prob X%','Prob 2%','Mise (€)','Cote jouee','Marche joue','Resultat','Gain/Perte (€)','Notes']
+    ['Date','Match','Ligue','Heure','Cote 1','Cote X','Cote 2','+1.5','+2.5','BTTS','Value','Edge %','Prob 1%','Prob X%','Prob 2%','Mise (EUR)','Cote jouee','Marche joue','Resultat','Gain/Perte (EUR)','Notes']
   ];
-  s.fixtures.forEach(function(f){
-    var o=s.odds[f.fixture.id]||{};
-    var val=o.home?calcValue(o):null;
-    var time=new Date(f.fixture.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    var lname=LEAGUES[f.league.id]?LEAGUES[f.league.id].name:f.league.name;
-    var edge=val?val.best.edge.toFixed(1):'';
-    var valueLabel=val?(val.best.edge>=5?'VALUE FORTE':val.best.edge>=2?'Value moderee':'Equilibree'):'';
-    var ph=val?(val.fh*100).toFixed(0):'';
-    var pd=val?(val.fd*100).toFixed(0):'';
-    var pa=val?(val.fa*100).toFixed(0):'';
-    rows.push([
-      f.teams.home.name+' vs '+f.teams.away.name,
-      lname,
-      time,
-      o.home||'',
-      o.draw||'',
-      o.away||'',
-      o.over15||'',
-      o.over25||'',
-      o.btts||'',
-      valueLabel,
-      edge,
-      ph,pd,pa,
-      '','','','','',''
-    ]);
-  });
+  function addFixtures(fixtures,oddsObj,dayLabel){
+    if(fixtures.length===0)return;
+    rows.push([dayLabel,'','','','','','','','','','','','','','','','','','','','']);
+    fixtures.forEach(function(f){
+      var o=oddsObj[f.fixture.id]||{};
+      var val=o.home?calcValue(o):null;
+      var time=new Date(f.fixture.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      var dateStr=new Date(f.fixture.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+      var lname=LEAGUES[f.league.id]?LEAGUES[f.league.id].name:f.league.name;
+      var edge=val?val.best.edge.toFixed(1):'';
+      var valueLabel=val?(val.best.edge>=5?'VALUE FORTE':val.best.edge>=2?'Value moderee':'Equilibree'):'';
+      var ph=val?(val.fh*100).toFixed(0):'';
+      var pd=val?(val.fd*100).toFixed(0):'';
+      var pa=val?(val.fa*100).toFixed(0):'';
+      var conseil=oddsObj===state.today.odds?state.today.analyses[f.fixture.id]||'':state.tomorrow.analyses[f.fixture.id]||'';
+      var rowIdx=rows.length;
+      rows.push([dateStr,f.teams.home.name+' vs '+f.teams.away.name,lname,time,o.home||'',o.draw||'',o.away||'',o.over15||'',o.over25||'',o.btts||'',valueLabel,edge,ph,pd,pa,'','','','','',conseil]);
+      // Stocker les infos de surbrillance
+      if(!window._highlights)window._highlights={};
+      window._highlights[rowIdx]={
+        bestCol:val?(val.best.label==='1'?4:val.best.label==='X'?5:6):-1,
+        bestButsKey:bestButs?bestButs.key:null
+      };
+    });
+  }
+  addFixtures(todayFixtures,state.today.odds,'--- AUJOURD\'HUI ---');
+  addFixtures(tomorrowFixtures,state.tomorrow.odds,'--- DEMAIN ---');
   rows.push([]);
-  rows.push(['TOTAL','','','','','','','','','','','','','','=SUM(O5:O'+(rows.length)+')',
-    '','','','=SUM(S5:S'+(rows.length)+')','']);
+  var dataStart=5;var dataEnd=rows.length;
+  rows.push(['TOTAL','','','','','','','','','','','','','','','=SUM(P'+dataStart+':P'+dataEnd+')','','','','=SUM(T'+dataStart+':T'+dataEnd+')','']);
 
   var wb=XLSX.utils.book_new();
   var ws=XLSX.utils.aoa_to_sheet(rows);
 
-  // Largeurs colonnes
-  ws['!cols']=[
-    {wch:30},{wch:14},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},
-    {wch:14},{wch:7},{wch:8},{wch:8},{wch:8},{wch:8},{wch:10},{wch:14},{wch:10},{wch:14},{wch:20}
-  ];
+  ws['!cols']=[{wch:10},{wch:28},{wch:14},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:14},{wch:7},{wch:7},{wch:7},{wch:7},{wch:8},{wch:10},{wch:14},{wch:10},{wch:14},{wch:50}];
+
+  // Gras headers
+  for(var hc=0;hc<21;hc++){var hRef=XLSX.utils.encode_cell({r:3,c:hc});if(!ws[hRef])ws[hRef]={v:'',t:'s'};if(!ws[hRef].s)ws[hRef].s={};ws[hRef].s.font={bold:true};}
+
+  // Gras séparateurs + conseils + surbrillances
+  rows.forEach(function(row,ri){
+    if(ri<4)return;
+    var col0=String(row[0]||'');
+    // Séparateurs en gras vert
+    if(col0.indexOf('AUJOURD')>=0||col0.indexOf('DEMAIN')>=0){
+      for(var sc=0;sc<21;sc++){var sRef=XLSX.utils.encode_cell({r:ri,c:sc});if(!ws[sRef])ws[sRef]={v:sc===0?col0:'',t:'s'};if(!ws[sRef].s)ws[sRef].s={};ws[sRef].s.font={bold:true,color:{rgb:'00E676'}};ws[sRef].s.fill={fgColor:{rgb:'0F1115'}};}
+      return;
+    }
+    // Conseil IA en gras col U (20)
+    var cRef=XLSX.utils.encode_cell({r:ri,c:20});
+    if(ws[cRef]&&ws[cRef].v&&String(ws[cRef].v).length>3){if(!ws[cRef].s)ws[cRef].s={};ws[cRef].s.font={bold:true};ws[cRef].s.alignment={wrapText:true,vertical:'top'};}
+    // Surbrillances depuis _highlights
+    var hl=window._highlights&&window._highlights[ri];
+    if(hl){
+      // Meilleure cote 1X2 en vert (col 4=1, 5=X, 6=2)
+      if(hl.bestCol>=0){
+        var gRef=XLSX.utils.encode_cell({r:ri,c:hl.bestCol});
+        if(ws[gRef]){if(!ws[gRef].s)ws[gRef].s={};ws[gRef].s.fill={fgColor:{rgb:'0A3D1F'}};ws[gRef].s.font={bold:true,color:{rgb:'00E676'}};}
+      }
+      // Meilleur marché buts en bleu (over15=col7, over25=col8, btts=col9)
+      var butsCol=hl.bestButsKey==='over15'?7:hl.bestButsKey==='over25'?8:hl.bestButsKey==='btts'?9:-1;
+      if(butsCol>=0){
+        var bRef=XLSX.utils.encode_cell({r:ri,c:butsCol});
+        if(ws[bRef]){if(!ws[bRef].s)ws[bRef].s={};ws[bRef].s.fill={fgColor:{rgb:'0A1A3D'}};ws[bRef].s.font={bold:true,color:{rgb:'7AB8FF'}};}
+      }
+    }
+  });
 
   XLSX.utils.book_append_sheet(wb,ws,'Paris');
-  var filename='TipsterPRO_'+getDate(currentDay==='tomorrow'?1:0)+'.xlsx';
-  XLSX.writeFile(wb,filename);
+  XLSX.writeFile(wb,'TipsterPRO_'+getDate(0)+'.xlsx');
+  window._highlights={};
   showToast('Excel telecharge !');
 }
 
@@ -321,6 +351,7 @@ async function toggleCard(id,day){
   var val=odds?calcValue(odds):null;
   var bestButs=getBestButs(odds);
   var ai=await getAI(fix,odds,val,bestButs);
+  state[day].analyses[id]=ai.replace(/<br>/g,'\n').replace(/<strong>(.*?)<\/strong>/g,'$1').replace(/<[^>]+>/g,'');
   var hf=fix.teams.home.form||'',af=fix.teams.away.form||'';
   var probs='';
   if(val){
@@ -379,7 +410,7 @@ async function getAI(fix,odds,val,bestButs){
   var ot=odds?'Cotes 1X2: '+home+' '+odds.home+' / Nul '+odds.draw+' / '+away+' '+odds.away:'Cotes 1X2 indisponibles';
   var vt=val?'Edge value 1X2: '+val.best.edge.toFixed(1)+'% sur '+(val.best.label==='1'?home:val.best.label==='2'?away:'Nul'):'Pas de value 1X2';
   var bt='Marches buts: +1.5='+(odds&&odds.over15?odds.over15:'N/A')+' | +2.5='+(odds&&odds.over25?odds.over25:'N/A')+' | BTTS='+(odds&&odds.btts?odds.btts:'N/A');
-  var prompt='Tu es un expert en paris sportifs. Analyse ce match.\n\nMatch: '+home+' vs '+away+' ('+fix.league.name+')\nForme dom: '+(fix.teams.home.form||'N/A')+' | ext: '+(fix.teams.away.form||'N/A')+'\n'+ot+'\n'+vt+'\n'+bt+'\n\nAnalyse en 4 points:\n1. Contexte et forme (2 lignes max)\n2. Recommandation 1X2: quel pari, pourquoi, confiance\n3. Recommandation buts: +1.5, +2.5 ou BTTS - lequel et pourquoi\n4. Synthese: meilleur pari + risque (Faible/Modere/Eleve)\n\nDirect et factuel.';
+  var prompt='Tu es un expert en paris sportifs francophone. Reponds UNIQUEMENT en français.\n\nMatch: '+home+' vs '+away+' ('+fix.league.name+')\nForme dom: '+(fix.teams.home.form||'N/A')+' | ext: '+(fix.teams.away.form||'N/A')+'\n'+ot+'\n'+vt+'\n'+bt+'\n\nAnalyse en 4 points:\n1. Contexte et forme (2 lignes max)\n2. Recommandation 1X2: quel pari, pourquoi, confiance\n3. Recommandation buts: +1.5, +2.5 ou BTTS - lequel et pourquoi\n4. Synthese: meilleur pari + risque (Faible/Modere/Eleve)\n\nDirect et factuel.';
   try{
     var r=await fetch('/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
     var d=await r.json();
