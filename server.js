@@ -6,36 +6,37 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY || '';
-const OPENROUTER_KEY = process.env.OPENROUTER_KEY || '';
+const GROQ_KEY = process.env.GROQ_KEY || '';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/status', (req, res) => {
-  res.json({ status: 'TipsterPRO actif', version: '4.0', ai: !!OPENROUTER_KEY });
+  res.json({ status: 'TipsterPRO actif', version: '4.0', ai: !!GROQ_KEY });
 });
 
 // Test IA
 app.get('/ai-test', async (req, res) => {
   try {
     const response = await axios.post(
-      'https://openrouter.ai/api/v1/chat/completions',
+      'https://api.groq.com/openai/v1/chat/completions',
       {
-        model: 'google/gemma-3-4b-it:free',
-        messages: [{ role: 'user', content: 'Dis bonjour en français' }]
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: 'Dis bonjour en français' }],
+        max_tokens: 100
       },
       {
         headers: {
-          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Authorization': `Bearer ${GROQ_KEY}`,
           'Content-Type': 'application/json'
         }
       }
     );
     const text = response.data.choices?.[0]?.message?.content || 'Vide';
-    res.json({ success: true, text, key_present: !!OPENROUTER_KEY });
+    res.json({ success: true, text, key_present: !!GROQ_KEY });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, key_present: !!OPENROUTER_KEY });
+    res.status(500).json({ success: false, error: err.message, key_present: !!GROQ_KEY });
   }
 });
 
@@ -57,18 +58,19 @@ app.get('/api/*', async (req, res) => {
   }
 });
 
-// Proxy OpenRouter IA
+// Proxy Groq IA
 app.post('/ai', async (req, res) => {
   try {
     const response = await axios.post(
-      'https://openrouter.ai/api/v1/chat/completions',
+      'https://api.groq.com/openai/v1/chat/completions',
       {
-        model: 'google/gemma-3-4b-it:free',
-        messages: [{ role: 'user', content: req.body.prompt }]
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: req.body.prompt }],
+        max_tokens: 500
       },
       {
         headers: {
-          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Authorization': `Bearer ${GROQ_KEY}`,
           'Content-Type': 'application/json'
         }
       }
