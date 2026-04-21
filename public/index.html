@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#07080a">
 <title>TipsterPRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{--bg:#07080a;--s1:#0f1115;--s2:#171a1f;--s3:#1e2229;--border:#ffffff12;--border2:#ffffff20;--green:#00e676;--amber:#ffab00;--red:#ff4444;--blue:#448aff;--text:#f0f2f5;--muted:#6b7280;--muted2:#9ca3af;--r:10px;}
@@ -194,37 +194,7 @@ function exportToExcel(){
 
   ws['!cols']=[{wch:10},{wch:28},{wch:14},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:6},{wch:14},{wch:7},{wch:7},{wch:7},{wch:7},{wch:8},{wch:10},{wch:14},{wch:10},{wch:14},{wch:50}];
 
-  // Gras headers
-  for(var hc=0;hc<21;hc++){var hRef=XLSX.utils.encode_cell({r:3,c:hc});if(!ws[hRef])ws[hRef]={v:'',t:'s'};if(!ws[hRef].s)ws[hRef].s={};ws[hRef].s.font={bold:true};}
-
-  // Gras séparateurs + conseils + surbrillances
-  rows.forEach(function(row,ri){
-    if(ri<4)return;
-    var col0=String(row[0]||'');
-    // Séparateurs en gras vert
-    if(col0.indexOf('AUJOURD')>=0||col0.indexOf('DEMAIN')>=0){
-      for(var sc=0;sc<21;sc++){var sRef=XLSX.utils.encode_cell({r:ri,c:sc});if(!ws[sRef])ws[sRef]={v:sc===0?col0:'',t:'s'};if(!ws[sRef].s)ws[sRef].s={};ws[sRef].s.font={bold:true,color:{rgb:'00E676'}};ws[sRef].s.fill={fgColor:{rgb:'0F1115'}};}
-      return;
-    }
-    // Conseil IA en gras col U (20)
-    var cRef=XLSX.utils.encode_cell({r:ri,c:20});
-    if(ws[cRef]&&ws[cRef].v&&String(ws[cRef].v).length>3){if(!ws[cRef].s)ws[cRef].s={};ws[cRef].s.font={bold:true};ws[cRef].s.alignment={wrapText:true,vertical:'top'};}
-    // Surbrillances depuis _highlights
-    var hl=window._highlights&&window._highlights[ri];
-    if(hl){
-      // Meilleure cote 1X2 en vert (col 4=1, 5=X, 6=2)
-      if(hl.bestCol>=0){
-        var gRef=XLSX.utils.encode_cell({r:ri,c:hl.bestCol});
-        if(ws[gRef]){if(!ws[gRef].s)ws[gRef].s={};ws[gRef].s.fill={fgColor:{rgb:'0A3D1F'}};ws[gRef].s.font={bold:true,color:{rgb:'00E676'}};}
-      }
-      // Meilleur marché buts en bleu (over15=col7, over25=col8, btts=col9)
-      var butsCol=hl.bestButsKey==='over15'?7:hl.bestButsKey==='over25'?8:hl.bestButsKey==='btts'?9:-1;
-      if(butsCol>=0){
-        var bRef=XLSX.utils.encode_cell({r:ri,c:butsCol});
-        if(ws[bRef]){if(!ws[bRef].s)ws[bRef].s={};ws[bRef].s.fill={fgColor:{rgb:'0A1A3D'}};ws[bRef].s.font={bold:true,color:{rgb:'7AB8FF'}};}
-      }
-    }
-  });
+  // Formatage non supporte sans licence - export simple
 
   XLSX.utils.book_append_sheet(wb,ws,'Paris');
   XLSX.writeFile(wb,'TipsterPRO_'+getDate(0)+'.xlsx');
