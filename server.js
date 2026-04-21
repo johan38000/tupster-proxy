@@ -6,16 +6,14 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY || '';
+const ANTHROPIC_KEY = process.env.ANTHROPIC_KEY || '';
 
 app.use(cors());
 app.use(express.json());
-
-// Servir l'app HTML
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Health check
 app.get('/status', (req, res) => {
-  res.json({ status: 'TipsterPRO actif', version: '2.0' });
+  res.json({ status: 'TipsterPRO actif', version: '3.0' });
 });
 
 // Proxy API-Football
@@ -30,6 +28,26 @@ app.get('/api/*', async (req, res) => {
         'x-rapidapi-host': 'v3.football.api-sports.io'
       }
     });
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Proxy Anthropic IA
+app.post('/ai', async (req, res) => {
+  try {
+    const response = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      req.body,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_KEY,
+          'anthropic-version': '2023-06-01'
+        }
+      }
+    );
     res.json(response.data);
   } catch (err) {
     res.status(500).json({ error: err.message });
