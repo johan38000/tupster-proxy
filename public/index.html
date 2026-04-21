@@ -39,49 +39,62 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .sum-val.green{color:var(--green);}
 .sum-val.amber{color:var(--amber);}
 .sum-label{font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;text-transform:uppercase;}
-.match-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;cursor:pointer;touch-action:manipulation;}
+.match-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;}
 .match-card.value{border-left:3px solid var(--green);}
 .match-card.medium{border-left:3px solid var(--amber);}
-.card-top{padding:10px 12px 6px;display:flex;justify-content:space-between;align-items:center;}
+.card-top{padding:10px 12px 6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;touch-action:manipulation;}
 .league-tag{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;}
 .card-time{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;}
-.teams{padding:0 12px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.teams{padding:0 12px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;touch-action:manipulation;}
 .team{flex:1;font-size:13px;font-weight:600;line-height:1.3;}
 .team.away{text-align:right;}
 .vs{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--muted);padding:0 6px;flex-shrink:0;}
 .odds-strip{display:flex;gap:4px;padding:0 12px 6px;}
-.odds-strip.buts{padding:0 12px 10px;}
+.odds-strip.buts{padding:0 12px 8px;}
 .odd-box{flex:1;background:var(--s3);border-radius:6px;padding:6px 4px;text-align:center;}
 .odd-box.best{background:rgba(0,230,118,.13);border:1px solid rgba(0,230,118,.3);}
-.odd-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
-.odd-val{font-size:14px;font-weight:600;color:var(--text);}
 .odd-box.best .odd-val{color:var(--green);}
 .odd-box.blue-box{background:rgba(68,138,255,.1);border:1px solid rgba(68,138,255,.2);}
 .odd-box.blue-box .odd-val{color:var(--blue);}
-.value-row{padding:6px 12px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
+.odd-box.blue-best{background:rgba(68,138,255,.25);border:1px solid rgba(68,138,255,.5);}
+.odd-box.blue-best .odd-val{color:#7ab8ff;}
+.odd-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
+.odd-val{font-size:14px;font-weight:600;color:var(--text);}
+.value-row{padding:6px 12px 8px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);cursor:pointer;touch-action:manipulation;}
 .value-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
 .vp-strong{background:rgba(0,230,118,.15);color:var(--green);}
 .vp-moderate{background:rgba(255,171,0,.15);color:var(--amber);}
 .vp-neutral{background:var(--s3);color:var(--muted);}
 .edge-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted2);}
-.detail{display:none;padding:10px 12px 12px;border-top:1px solid var(--border);background:var(--s2);}
+.tap-hint{font-size:10px;color:var(--muted);padding:4px 12px 8px;text-align:center;font-family:'DM Mono',monospace;}
+.detail{display:none;padding:12px;border-top:1px solid var(--border);background:var(--s2);}
 .detail.open{display:block;}
-.detail-section{margin-bottom:10px;}
-.detail-title{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:6px;}
+.detail-section{margin-bottom:12px;}
+.detail-title{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:6px;letter-spacing:.05em;}
 .form-dots{display:flex;gap:4px;}
 .dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
 .dot.W{background:rgba(0,230,118,.2);color:var(--green);}
 .dot.D{background:rgba(255,171,0,.15);color:var(--amber);}
 .dot.L{background:rgba(255,68,68,.15);color:var(--red);}
-.analysis-text{font-size:13px;color:var(--muted2);line-height:1.6;}
+.analysis-text{font-size:13px;color:var(--muted2);line-height:1.7;}
+.analysis-text strong{color:var(--text);}
 .prob-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
 .prob-label{font-size:11px;color:var(--muted);min-width:24px;font-family:'DM Mono',monospace;}
 .prob-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
 .prob-fill{height:100%;border-radius:2px;}
+.rec-box{background:var(--s3);border-radius:8px;padding:10px 12px;border-left:3px solid var(--green);}
+.rec-box.amber{border-left-color:var(--amber);}
+.rec-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:4px;}
+.rec-text{font-size:13px;font-weight:600;color:var(--text);}
 .loading{text-align:center;padding:50px 20px;}
 .spin{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 14px;}
 @keyframes sp{to{transform:rotate(360deg)}}
 .load-text{font-size:14px;color:var(--muted);}
+.ai-loading{display:flex;gap:5px;padding:10px 0;}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}
+.ai-dot:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 .err-box{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);border-radius:var(--r);padding:16px;text-align:center;margin:12px 0;}
 .err-title{font-size:14px;font-weight:600;color:var(--red);margin-bottom:6px;}
 .err-sub{font-size:12px;color:var(--muted2);line-height:1.7;}
@@ -115,20 +128,31 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 const LEAGUES={39:{name:'Premier League',flag:'EN'},61:{name:'Ligue 1',flag:'FR'},62:{name:'Ligue 2',flag:'FR'},140:{name:'La Liga',flag:'ES'},135:{name:'Serie A',flag:'IT'},78:{name:'Bundesliga',flag:'DE'},88:{name:'Eredivisie',flag:'NL'},141:{name:'Segunda',flag:'ES'},94:{name:'Primeira Liga',flag:'PT'},144:{name:'Pro League',flag:'BE'}};
 const state={today:{fixtures:[],odds:{},loaded:false},tomorrow:{fixtures:[],odds:{},loaded:false}};
 let currentDay='today',currentSection='all',expandedId=null;
+
 function getDate(o){o=o||0;var d=new Date();d.setDate(d.getDate()+o);return d.toISOString().split('T')[0];}
 function formatDate(o){o=o||0;var d=new Date();d.setDate(d.getDate()+o);return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}
 function setBar(p){document.getElementById('loadBar').style.width=p+'%';}
 function setInfo(t){document.getElementById('refreshInfo').textContent=t;}
 function reloadCurrent(){state[currentDay].loaded=false;state[currentDay].fixtures=[];state[currentDay].odds={};expandedId=null;loadDay(currentDay);}
-async function apiFetch(ep){var r=await fetch('/api'+ep);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
-async function fetchFixtures(date){var d=await apiFetch('/fixtures?date='+date+'&season=2025&timezone=Europe/Paris');return(d.response||[]).filter(function(f){return Object.keys(LEAGUES).includes(String(f.league.id));});}
+
+async function apiFetch(ep){
+  var r=await fetch('/api'+ep);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+async function fetchFixtures(date){
+  var d=await apiFetch('/fixtures?date='+date+'&season=2025&timezone=Europe/Paris');
+  return(d.response||[]).filter(function(f){return Object.keys(LEAGUES).includes(String(f.league.id));});
+}
+
 async function fetchOdds(fid){
   var bookmakers=[2,1,6,16,8];
   for(var i=0;i<bookmakers.length;i++){
     try{
       var d=await apiFetch('/odds?fixture='+fid+'&bookmaker='+bookmakers[i]);
       if(d.response&&d.response.length>0){
-        var bets=d.response[0].bookmakers&&d.response[0].bookmakers[0]?d.response[0].bookmakers[0].bets:[];
+        var bets=(d.response[0].bookmakers&&d.response[0].bookmakers[0])?d.response[0].bookmakers[0].bets:[];
         var result={};
         var h2h=bets.find(function(b){return b.name==='Match Winner';});
         if(h2h){h2h.values.forEach(function(x){if(x.value==='Home')result.home=parseFloat(x.odd);if(x.value==='Draw')result.draw=parseFloat(x.odd);if(x.value==='Away')result.away=parseFloat(x.odd);});}
@@ -142,6 +166,7 @@ async function fetchOdds(fid){
   }
   return null;
 }
+
 function calcValue(o){
   if(!o||!o.home||!o.draw||!o.away)return null;
   var ih=1/o.home,id=1/o.draw,ia=1/o.away,m=ih+id+ia;
@@ -151,8 +176,21 @@ function calcValue(o){
   arr.sort(function(a,b){return b.edge-a.edge;});
   return{eh:eh,ed:ed,ea:ea,best:arr[0],fh:fh,fd:fd,fa:fa};
 }
+
+function getBestButs(odds){
+  if(!odds)return null;
+  var candidates=[];
+  if(odds.over15)candidates.push({label:'+1.5 buts',cote:odds.over15,key:'over15'});
+  if(odds.over25)candidates.push({label:'+2.5 buts',cote:odds.over25,key:'over25'});
+  if(odds.btts)candidates.push({label:'BTTS',cote:odds.btts,key:'btts'});
+  if(candidates.length===0)return null;
+  candidates.sort(function(a,b){return b.cote-a.cote;});
+  return candidates[0];
+}
+
 function vl(e){if(e>=5)return{cls:'vp-strong',txt:'VALUE FORTE'};if(e>=2)return{cls:'vp-moderate',txt:'Value moderee'};return{cls:'vp-neutral',txt:'Equilibree'};}
 function renderForm(f){if(!f)return'';return f.slice(-5).split('').map(function(c){return'<div class="dot '+c+'">'+c+'</div>';}).join('');}
+
 function renderCard(fix,odds,val,day){
   var id=fix.fixture.id;
   var home=fix.teams.home.name,away=fix.teams.away.name;
@@ -167,18 +205,33 @@ function renderCard(fix,odds,val,day){
     bi=val.best.label;
     var v=vl(val.best.edge);
     var bn=bi==='1'?home.split(' ')[0]:bi==='2'?away.split(' ')[0]:'Nul';
-    vRow='<div class="value-row"><span class="value-pill '+v.cls+'">'+v.txt+'</span><span class="edge-val">'+(val.best.edge>=0?'+':'')+val.best.edge.toFixed(1)+'% - '+bn+'</span></div>';
+    vRow='<div class="value-row" onclick="toggleCard('+id+',\''+day+'\')">'
+      +'<span class="value-pill '+v.cls+'">'+v.txt+'</span>'
+      +'<span class="edge-val">'+(val.best.edge>=0?'+':'')+val.best.edge.toFixed(1)+'% - '+bn+' | Appuie pour analyse</span>'
+      +'</div>';
   }else{
-    vRow='<div class="value-row"><span class="value-pill vp-neutral">Cotes en attente</span></div>';
+    vRow='<div class="value-row" onclick="toggleCard('+id+',\''+day+'\')">'
+      +'<span class="value-pill vp-neutral">Cotes en attente</span>'
+      +'<span class="edge-val">Appuie pour analyse IA</span>'
+      +'</div>';
   }
   var ho=odds&&odds.home?odds.home:'--',dr=odds&&odds.draw?odds.draw:'--',aw=odds&&odds.away?odds.away:'--';
-  var o15=odds&&odds.over15?'<div class="odd-box blue-box"><div class="odd-label">+1.5</div><div class="odd-val">'+odds.over15+'</div></div>':'';
-  var o25=odds&&odds.over25?'<div class="odd-box blue-box"><div class="odd-label">+2.5</div><div class="odd-val">'+odds.over25+'</div></div>':'';
-  var bt=odds&&odds.btts?'<div class="odd-box blue-box"><div class="odd-label">BTTS</div><div class="odd-val">'+odds.btts+'</div></div>':'';
+  var bestButs=getBestButs(odds);
+  var o15cls=bestButs&&bestButs.key==='over15'?'blue-best':'blue-box';
+  var o25cls=bestButs&&bestButs.key==='over25'?'blue-best':'blue-box';
+  var btcls=bestButs&&bestButs.key==='btts'?'blue-best':'blue-box';
+  var o15=odds&&odds.over15?'<div class="odd-box '+o15cls+'"><div class="odd-label">+1.5</div><div class="odd-val">'+odds.over15+'</div></div>':'';
+  var o25=odds&&odds.over25?'<div class="odd-box '+o25cls+'"><div class="odd-label">+2.5</div><div class="odd-val">'+odds.over25+'</div></div>':'';
+  var bt=odds&&odds.btts?'<div class="odd-box '+btcls+'"><div class="odd-label">BTTS</div><div class="odd-val">'+odds.btts+'</div></div>':'';
   var butsRow=(o15||o25||bt)?'<div class="odds-strip buts">'+o15+o25+bt+'</div>':'';
-  return '<div class="match-card '+cls+'" onclick="toggleCard('+id+',\''+day+'\')">'
-    +'<div class="card-top"><span class="league-tag">'+lflag+' '+lname+'</span><span class="card-time">'+(isLive?'LIVE':time)+'</span></div>'
-    +'<div class="teams"><div class="team home">'+home+'</div><div class="vs">VS</div><div class="team away">'+away+'</div></div>'
+  return '<div class="match-card '+cls+'">'
+    +'<div class="card-top" onclick="toggleCard('+id+',\''+day+'\')">'
+    +'<span class="league-tag">'+lflag+' '+lname+'</span>'
+    +'<span class="card-time">'+(isLive?'🔴 LIVE':time)+'</span>'
+    +'</div>'
+    +'<div class="teams" onclick="toggleCard('+id+',\''+day+'\')">'
+    +'<div class="team home">'+home+'</div><div class="vs">VS</div><div class="team away">'+away+'</div>'
+    +'</div>'
     +'<div class="odds-strip">'
     +'<div class="odd-box '+(bi==='1'?'best':'')+'"><div class="odd-label">1</div><div class="odd-val">'+ho+'</div></div>'
     +'<div class="odd-box '+(bi==='X'?'best':'')+'"><div class="odd-label">X</div><div class="odd-val">'+dr+'</div></div>'
@@ -186,9 +239,12 @@ function renderCard(fix,odds,val,day){
     +'</div>'
     +butsRow
     +vRow
-    +'<div class="detail" id="detail-'+id+'"><div class="load-text" style="font-size:12px;color:var(--muted);padding:8px 0">Chargement analyse IA...</div></div>'
+    +'<div class="detail" id="detail-'+id+'">'
+    +'<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>'
+    +'</div>'
     +'</div>';
 }
+
 async function toggleCard(id,day){
   var det=document.getElementById('detail-'+id);
   if(!det)return;
@@ -198,44 +254,64 @@ async function toggleCard(id,day){
   if(det.dataset.loaded)return;
   det.dataset.loaded='1';
   var fix=state[day].fixtures.find(function(f){return f.fixture.id===id;});
-  if(!fix){det.innerHTML='<div>Match non trouve.</div>';return;}
+  if(!fix){det.innerHTML='<div style="padding:10px;color:var(--muted)">Match non trouve.</div>';return;}
   var odds=state[day].odds[id]||null;
   var val=odds?calcValue(odds):null;
-  var ai=await getAI(fix,odds,val);
+  var bestButs=getBestButs(odds);
+  var ai=await getAI(fix,odds,val,bestButs);
   var hf=fix.teams.home.form||'',af=fix.teams.away.form||'';
   var probs='';
   if(val){
     var ph=(val.fh*100).toFixed(0),pd=(val.fd*100).toFixed(0),pa=(val.fa*100).toFixed(0);
     probs='<div class="detail-section"><div class="detail-title">Probabilites reelles</div>'
-      +'<div class="prob-row"><span class="prob-label">1</span><div class="prob-track"><div class="prob-fill" style="width:'+ph+'%;background:var(--green)"></div></div><span style="font-size:11px;color:var(--muted2);min-width:30px">'+ph+'%</span></div>'
-      +'<div class="prob-row"><span class="prob-label">X</span><div class="prob-track"><div class="prob-fill" style="width:'+pd+'%;background:var(--amber)"></div></div><span style="font-size:11px;color:var(--muted2);min-width:30px">'+pd+'%</span></div>'
-      +'<div class="prob-row"><span class="prob-label">2</span><div class="prob-track"><div class="prob-fill" style="width:'+pa+'%;background:var(--blue)"></div></div><span style="font-size:11px;color:var(--muted2);min-width:30px">'+pa+'%</span></div>'
+      +'<div class="prob-row"><span class="prob-label">1</span><div class="prob-track"><div class="prob-fill" style="width:'+ph+'%;background:var(--green)"></div></div><span style="font-size:11px;color:var(--muted2);min-width:32px">'+ph+'%</span></div>'
+      +'<div class="prob-row"><span class="prob-label">X</span><div class="prob-track"><div class="prob-fill" style="width:'+pd+'%;background:var(--amber)"></div></div><span style="font-size:11px;color:var(--muted2);min-width:32px">'+pd+'%</span></div>'
+      +'<div class="prob-row"><span class="prob-label">2</span><div class="prob-track"><div class="prob-fill" style="width:'+pa+'%;background:var(--blue)"></div></div><span style="font-size:11px;color:var(--muted2);min-width:32px">'+pa+'%</span></div>'
       +'</div>';
   }
-  det.innerHTML=
-    (hf?'<div class="detail-section"><div class="detail-title">Forme - '+fix.teams.home.name.split(' ')[0]+'</div><div class="form-dots">'+renderForm(hf)+'</div></div>':'')
-    +(af?'<div class="detail-section"><div class="detail-title">Forme - '+fix.teams.away.name.split(' ')[0]+'</div><div class="form-dots">'+renderForm(af)+'</div></div>':'')
-    +probs
-    +'<div class="detail-section"><div class="detail-title">Analyse IA</div><div class="analysis-text">'+ai.replace(/\n/g,'<br>')+'</div></div>';
+  var formSection='';
+  if(hf||af){
+    formSection='<div class="detail-section" style="display:flex;gap:16px">';
+    if(hf)formSection+='<div><div class="detail-title">'+fix.teams.home.name.split(' ')[0]+'</div><div class="form-dots">'+renderForm(hf)+'</div></div>';
+    if(af)formSection+='<div><div class="detail-title">'+fix.teams.away.name.split(' ')[0]+'</div><div class="form-dots">'+renderForm(af)+'</div></div>';
+    formSection+='</div>';
+  }
+  det.innerHTML=formSection+probs
+    +'<div class="detail-section"><div class="detail-title">Analyse IA</div>'
+    +'<div class="analysis-text">'+ai+'</div></div>';
 }
-async function getAI(fix,odds,val){
+
+async function getAI(fix,odds,val,bestButs){
   var home=fix.teams.home.name,away=fix.teams.away.name;
-  var ot=odds?'Cotes 1X2: '+home+' '+odds.home+' / Nul '+odds.draw+' / '+away+' '+odds.away:'Cotes indisponibles';
-  var vt=val?'Edge 1X2: '+val.best.edge.toFixed(1)+'% sur '+val.best.label:'';
-  var bt='Buts: +1.5='+(odds&&odds.over15?odds.over15:'N/A')+' | +2.5='+(odds&&odds.over25?odds.over25:'N/A')+' | BTTS='+(odds&&odds.btts?odds.btts:'N/A');
-  var prompt='Tu es un expert en paris sportifs. Analyse ce match.\n\nMatch: '+home+' vs '+away+' ('+fix.league.name+')\nForme domicile: '+(fix.teams.home.form||'N/A')+' | Forme exterieur: '+(fix.teams.away.form||'N/A')+'\n'+ot+'\n'+vt+'\n'+bt+'\n\nDonne une analyse en 4 points MAX:\n1. Contexte rapide (1 ligne)\n2. Pari 1X2 recommande + justification courte\n3. Pari buts recommande (+1.5, +2.5 ou BTTS) + justification courte\n4. Niveau de risque global (Faible / Modere / Eleve)\n\nSois direct et factuel. Pas de blabla.';
+  var ot=odds?'Cotes 1X2: '+home+' '+odds.home+' / Nul '+odds.draw+' / '+away+' '+odds.away:'Cotes 1X2 indisponibles';
+  var vt=val?'Edge value 1X2: '+val.best.edge.toFixed(1)+'% sur '+val.best.label+' ('+( val.best.label==='1'?home:val.best.label==='2'?away:'Nul')+')':'Pas de value 1X2 detectee';
+  var bt='Marches buts: +1.5='+(odds&&odds.over15?odds.over15:'N/A')+' | +2.5='+(odds&&odds.over25?odds.over25:'N/A')+' | BTTS='+(odds&&odds.btts?odds.btts:'N/A');
+  var bb=bestButs?'Meilleure cote buts: '+bestButs.label+' a '+bestButs.cote:'';
+  var prompt='Tu es un expert en paris sportifs. Analyse ce match de facon complete et structuree.\n\n'
+    +'Match: '+home+' vs '+away+' ('+fix.league.name+')\n'
+    +'Forme domicile: '+(fix.teams.home.form||'N/A')+' | Forme exterieur: '+(fix.teams.away.form||'N/A')+'\n'
+    +ot+'\n'+vt+'\n'+bt+'\n'+bb+'\n\n'
+    +'Donne une analyse structuree avec ces 4 points:\n'
+    +'1. Contexte et forme (2 lignes max)\n'
+    +'2. Recommandation 1X2: quel pari, pourquoi, niveau de confiance\n'
+    +'3. Recommandation buts: +1.5, +2.5 ou BTTS - lequel privilegier et pourquoi\n'
+    +'4. Synthese: meilleur pari du match + risque (Faible/Modere/Eleve)\n\n'
+    +'Sois direct, factuel, pas de blabla. Utilise des chiffres et des faits concrets.';
   try{
     var r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:350,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
     });
     var d=await r.json();
-    return d.content&&d.content[0]?d.content[0].text:'Analyse indisponible.';
-  }catch(e){return 'Analyse indisponible.';}
+    var text=d.content&&d.content[0]?d.content[0].text:'Analyse indisponible.';
+    return text.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  }catch(e){return 'Analyse indisponible. Verifie ta connexion.';}
 }
+
 function switchDay(day){currentDay=day;expandedId=null;document.getElementById('dtab-today').classList.toggle('active',day==='today');document.getElementById('dtab-tomorrow').classList.toggle('active',day==='tomorrow');if(!state[day].loaded)loadDay(day);else renderContent();}
 function switchSection(sec){currentSection=sec;expandedId=null;['all','values','leagues'].forEach(function(s){document.getElementById('stab-'+s).classList.toggle('active',s===sec);});renderContent();}
+
 function renderContent(){
   var c=document.getElementById('mainContent');
   var s=state[currentDay];
@@ -250,7 +326,14 @@ function renderContent(){
       if(o){var v=calcValue(o);if(v&&v.best.edge>=2)bl[lid].vals++;}
     });
     c.innerHTML='<div class="date-label">'+dl.charAt(0).toUpperCase()+dl.slice(1)+'</div>'
-      +Object.entries(bl).map(function(e){var id=e[0],l=e[1];return'<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px">'+l.info.flag+' '+l.info.name+'</span><div><span style="font-size:12px;color:var(--muted2)">'+l.count+' matchs</span>'+(l.vals>0?'<span style="font-size:11px;color:var(--green);margin-left:8px">'+l.vals+' values</span>':'')+'</div></div>';}).join('');
+      +Object.entries(bl).map(function(e){
+        var id=e[0],l=e[1];
+        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">'
+          +'<span style="font-size:13px">'+l.info.flag+' '+l.info.name+'</span>'
+          +'<div><span style="font-size:12px;color:var(--muted2)">'+l.count+' matchs</span>'
+          +(l.vals>0?'<span style="font-size:11px;color:var(--green);margin-left:8px">'+l.vals+' values</span>':'')
+          +'</div></div>';
+      }).join('');
     return;
   }
   var fx=s.fixtures.slice();
@@ -260,18 +343,25 @@ function renderContent(){
   }
   var sc=s.fixtures.filter(function(f){var o=s.odds[f.fixture.id];if(!o)return false;var v=calcValue(o);return v&&v.best.edge>=5;}).length;
   var mc=s.fixtures.filter(function(f){var o=s.odds[f.fixture.id];if(!o)return false;var v=calcValue(o);return v&&v.best.edge>=2&&v.best.edge<5;}).length;
-  var html='<div class="summary"><div class="sum-card"><div class="sum-val">'+s.fixtures.length+'</div><div class="sum-label">Matchs</div></div><div class="sum-card"><div class="sum-val green">'+sc+'</div><div class="sum-label">Values+</div></div><div class="sum-card"><div class="sum-val amber">'+mc+'</div><div class="sum-label">Moderees</div></div></div><div class="date-label">'+dl.charAt(0).toUpperCase()+dl.slice(1)+'</div>';
-  if(fx.length===0){html+='<div class="empty">'+(currentSection==='values'?'Aucune value detectee.':'Aucun match trouve.')+'</div>';}
-  else{fx.forEach(function(f){var o=s.odds[f.fixture.id]||null;html+=renderCard(f,o,o?calcValue(o):null,currentDay);});}
+  var html='<div class="summary">'
+    +'<div class="sum-card"><div class="sum-val">'+s.fixtures.length+'</div><div class="sum-label">Matchs</div></div>'
+    +'<div class="sum-card"><div class="sum-val green">'+sc+'</div><div class="sum-label">Values+</div></div>'
+    +'<div class="sum-card"><div class="sum-val amber">'+mc+'</div><div class="sum-label">Moderees</div></div>'
+    +'</div><div class="date-label">'+dl.charAt(0).toUpperCase()+dl.slice(1)+'</div>';
+  if(fx.length===0){
+    html+='<div class="empty">'+(currentSection==='values'?'Aucune value detectee pour cette journee.':'Aucun match trouve.')+'</div>';
+  }else{
+    fx.forEach(function(f){var o=s.odds[f.fixture.id]||null;html+=renderCard(f,o,o?calcValue(o):null,currentDay);});
+  }
   c.innerHTML=html;
 }
+
 async function loadDay(day){
   var offset=day==='tomorrow'?1:0;
   var date=getDate(offset);
   document.getElementById('mainContent').innerHTML='<div class="loading"><div class="spin"></div><div class="load-text">Recuperation des matchs...</div></div>';
   document.getElementById('statusText').textContent='Chargement...';
-  setInfo('Chargement...');
-  setBar(5);
+  setInfo('Chargement...');setBar(5);
   try{
     var fixtures=await fetchFixtures(date);
     state[day].fixtures=fixtures;
@@ -296,7 +386,11 @@ async function loadDay(day){
     setBar(0);
     document.getElementById('statusText').textContent='Erreur';
     setInfo('Erreur - appuie Rafraichir');
-    document.getElementById('mainContent').innerHTML='<div style="padding:10px"><div class="err-box"><div class="err-title">Erreur de connexion</div><div class="err-sub">'+err.message+'<br><br>Appuie sur Rafraichir ci-dessus.</div></div></div>';
+    document.getElementById('mainContent').innerHTML='<div style="padding:10px">'
+      +'<div class="err-box">'
+      +'<div class="err-title">Erreur de connexion</div>'
+      +'<div class="err-sub">'+err.message+'<br><br>Le serveur Render se reveille en 30-60s.<br>Appuie sur Rafraichir ci-dessus.</div>'
+      +'</div></div>';
   }
 }
 loadDay('today');
