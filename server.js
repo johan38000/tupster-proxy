@@ -6,27 +6,36 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY || '';
-const GEMINI_KEY = process.env.GEMINI_KEY || '';
+const OPENROUTER_KEY = process.env.OPENROUTER_KEY || '';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/status', (req, res) => {
-  res.json({ status: 'TipsterPRO actif', version: '3.0', gemini: !!GEMINI_KEY });
+  res.json({ status: 'TipsterPRO actif', version: '4.0', ai: !!OPENROUTER_KEY });
 });
 
-// Test Gemini
+// Test IA
 app.get('/ai-test', async (req, res) => {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
-    const response = await axios.post(url, {
-      contents: [{ parts: [{ text: 'Dis bonjour en français' }] }]
-    });
-    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'Vide';
-    res.json({ success: true, text, key_present: !!GEMINI_KEY });
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'mistralai/mistral-7b-instruct:free',
+        messages: [{ role: 'user', content: 'Dis bonjour en français' }]
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    const text = response.data.choices?.[0]?.message?.content || 'Vide';
+    res.json({ success: true, text, key_present: !!OPENROUTER_KEY });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message, key_present: !!GEMINI_KEY });
+    res.status(500).json({ success: false, error: err.message, key_present: !!OPENROUTER_KEY });
   }
 });
 
@@ -48,14 +57,23 @@ app.get('/api/*', async (req, res) => {
   }
 });
 
-// Proxy Gemini IA
+// Proxy OpenRouter IA
 app.post('/ai', async (req, res) => {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
-    const response = await axios.post(url, {
-      contents: [{ parts: [{ text: req.body.prompt }] }]
-    });
-    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analyse indisponible.';
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'mistralai/mistral-7b-instruct:free',
+        messages: [{ role: 'user', content: req.body.prompt }]
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    const text = response.data.choices?.[0]?.message?.content || 'Analyse indisponible.';
     res.json({ text });
   } catch (err) {
     res.status(500).json({ error: err.message, text: 'Analyse indisponible.' });
