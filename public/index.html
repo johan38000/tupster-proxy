@@ -65,8 +65,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .vp-strong{background:rgba(0,230,118,.15);color:var(--green);}
 .vp-moderate{background:rgba(255,171,0,.15);color:var(--amber);}
 .vp-neutral{background:var(--s3);color:var(--muted);}
-.edge-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted2);}
-.tap-hint{font-size:10px;color:var(--muted);padding:4px 12px 8px;text-align:center;font-family:'DM Mono',monospace;}
+.edge-val{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted2);}
 .detail{display:none;padding:12px;border-top:1px solid var(--border);background:var(--s2);}
 .detail.open{display:block;}
 .detail-section{margin-bottom:12px;}
@@ -82,19 +81,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .prob-label{font-size:11px;color:var(--muted);min-width:24px;font-family:'DM Mono',monospace;}
 .prob-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
 .prob-fill{height:100%;border-radius:2px;}
-.rec-box{background:var(--s3);border-radius:8px;padding:10px 12px;border-left:3px solid var(--green);}
-.rec-box.amber{border-left-color:var(--amber);}
-.rec-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:4px;}
-.rec-text{font-size:13px;font-weight:600;color:var(--text);}
 .loading{text-align:center;padding:50px 20px;}
 .spin{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 14px;}
 @keyframes sp{to{transform:rotate(360deg)}}
 .load-text{font-size:14px;color:var(--muted);}
-.ai-loading{display:flex;gap:5px;padding:10px 0;}
+.ai-loading{display:flex;gap:5px;padding:10px 0;align-items:center;}
 .ai-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite;}
 .ai-dot:nth-child(2){animation-delay:.2s;}
 .ai-dot:nth-child(3){animation-delay:.4s;}
 @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.ai-loading-text{font-size:12px;color:var(--muted);margin-left:8px;font-family:'DM Mono',monospace;}
 .err-box{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);border-radius:var(--r);padding:16px;text-align:center;margin:12px 0;}
 .err-title{font-size:14px;font-weight:600;color:var(--red);margin-bottom:6px;}
 .err-sub{font-size:12px;color:var(--muted2);line-height:1.7;}
@@ -207,11 +203,11 @@ function renderCard(fix,odds,val,day){
     var bn=bi==='1'?home.split(' ')[0]:bi==='2'?away.split(' ')[0]:'Nul';
     vRow='<div class="value-row" onclick="toggleCard('+id+',\''+day+'\')">'
       +'<span class="value-pill '+v.cls+'">'+v.txt+'</span>'
-      +'<span class="edge-val">'+(val.best.edge>=0?'+':'')+val.best.edge.toFixed(1)+'% - '+bn+' | Appuie pour analyse</span>'
+      +'<span class="edge-val">'+(val.best.edge>=0?'+':'')+val.best.edge.toFixed(1)+'% - '+bn+' | Analyse IA</span>'
       +'</div>';
   }else{
     vRow='<div class="value-row" onclick="toggleCard('+id+',\''+day+'\')">'
-      +'<span class="value-pill vp-neutral">Cotes en attente</span>'
+      +'<span class="value-pill vp-neutral">Pas de cotes</span>'
       +'<span class="edge-val">Appuie pour analyse IA</span>'
       +'</div>';
   }
@@ -237,10 +233,9 @@ function renderCard(fix,odds,val,day){
     +'<div class="odd-box '+(bi==='X'?'best':'')+'"><div class="odd-label">X</div><div class="odd-val">'+dr+'</div></div>'
     +'<div class="odd-box '+(bi==='2'?'best':'')+'"><div class="odd-label">2</div><div class="odd-val">'+aw+'</div></div>'
     +'</div>'
-    +butsRow
-    +vRow
+    +butsRow+vRow
     +'<div class="detail" id="detail-'+id+'">'
-    +'<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>'
+    +'<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span class="ai-loading-text">Analyse en cours...</span></div>'
     +'</div>'
     +'</div>';
 }
@@ -277,14 +272,14 @@ async function toggleCard(id,day){
     formSection+='</div>';
   }
   det.innerHTML=formSection+probs
-    +'<div class="detail-section"><div class="detail-title">Analyse IA</div>'
+    +'<div class="detail-section"><div class="detail-title">Analyse IA (Gemini)</div>'
     +'<div class="analysis-text">'+ai+'</div></div>';
 }
 
 async function getAI(fix,odds,val,bestButs){
   var home=fix.teams.home.name,away=fix.teams.away.name;
   var ot=odds?'Cotes 1X2: '+home+' '+odds.home+' / Nul '+odds.draw+' / '+away+' '+odds.away:'Cotes 1X2 indisponibles';
-  var vt=val?'Edge value 1X2: '+val.best.edge.toFixed(1)+'% sur '+val.best.label+' ('+( val.best.label==='1'?home:val.best.label==='2'?away:'Nul')+')':'Pas de value 1X2 detectee';
+  var vt=val?'Edge value 1X2: '+val.best.edge.toFixed(1)+'% sur '+(val.best.label==='1'?home:val.best.label==='2'?away:'Nul'):'Pas de value 1X2 detectee';
   var bt='Marches buts: +1.5='+(odds&&odds.over15?odds.over15:'N/A')+' | +2.5='+(odds&&odds.over25?odds.over25:'N/A')+' | BTTS='+(odds&&odds.btts?odds.btts:'N/A');
   var bb=bestButs?'Meilleure cote buts: '+bestButs.label+' a '+bestButs.cote:'';
   var prompt='Tu es un expert en paris sportifs. Analyse ce match de facon complete et structuree.\n\n'
@@ -298,13 +293,13 @@ async function getAI(fix,odds,val,bestButs){
     +'4. Synthese: meilleur pari du match + risque (Faible/Modere/Eleve)\n\n'
     +'Sois direct, factuel, pas de blabla. Utilise des chiffres et des faits concrets.';
   try{
-    var r=await fetch('https://api.anthropic.com/v1/messages',{
+    var r=await fetch('/ai',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({prompt:prompt})
     });
     var d=await r.json();
-    var text=d.content&&d.content[0]?d.content[0].text:'Analyse indisponible.';
+    var text=d.text||'Analyse indisponible.';
     return text.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   }catch(e){return 'Analyse indisponible. Verifie ta connexion.';}
 }
@@ -349,7 +344,7 @@ function renderContent(){
     +'<div class="sum-card"><div class="sum-val amber">'+mc+'</div><div class="sum-label">Moderees</div></div>'
     +'</div><div class="date-label">'+dl.charAt(0).toUpperCase()+dl.slice(1)+'</div>';
   if(fx.length===0){
-    html+='<div class="empty">'+(currentSection==='values'?'Aucune value detectee pour cette journee.':'Aucun match trouve.')+'</div>';
+    html+='<div class="empty">'+(currentSection==='values'?'Aucune value detectee.':'Aucun match trouve.')+'</div>';
   }else{
     fx.forEach(function(f){var o=s.odds[f.fixture.id]||null;html+=renderCard(f,o,o?calcValue(o):null,currentDay);});
   }
