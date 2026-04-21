@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY || '';
-const ANTHROPIC_KEY = process.env.ANTHROPIC_KEY || '';
+const GEMINI_KEY = process.env.GEMINI_KEY || '';
 
 app.use(cors());
 app.use(express.json());
@@ -34,23 +34,19 @@ app.get('/api/*', async (req, res) => {
   }
 });
 
-// Proxy Anthropic IA
+// Proxy Gemini IA
 app.post('/ai', async (req, res) => {
   try {
-    const response = await axios.post(
-      'https://api.anthropic.com/v1/messages',
-      req.body,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_KEY,
-          'anthropic-version': '2023-06-01'
-        }
-      }
-    );
-    res.json(response.data);
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+    const response = await axios.post(url, {
+      contents: [{
+        parts: [{ text: req.body.prompt }]
+      }]
+    });
+    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analyse indisponible.';
+    res.json({ text });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message, text: 'Analyse indisponible.' });
   }
 });
 
