@@ -174,12 +174,12 @@ function exportToExcel(){
       var pa=val?(val.fa*100).toFixed(0):'';
       var conseil=oddsObj===state.today.odds?state.today.analyses[f.fixture.id]||'':state.tomorrow.analyses[f.fixture.id]||'';
       var rowIdx=rows.length;
+      var bestButsLocal=getBestButs(o);
       rows.push([dateStr,f.teams.home.name+' vs '+f.teams.away.name,lname,time,o.home||'',o.draw||'',o.away||'',o.over15||'',o.over25||'',o.btts||'',valueLabel,edge,ph,pd,pa,'','','','','',conseil]);
-      // Stocker les infos de surbrillance
       if(!window._highlights)window._highlights={};
       window._highlights[rowIdx]={
         bestCol:val?(val.best.label==='1'?4:val.best.label==='X'?5:6):-1,
-        bestButsKey:bestButs?bestButs.key:null
+        bestButsKey:bestButsLocal?bestButsLocal.key:null
       };
     });
   }
