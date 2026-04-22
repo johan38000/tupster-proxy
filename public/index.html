@@ -143,14 +143,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 
 <script>
 const LEAGUES={39:{name:'Premier League',flag:'EN'},61:{name:'Ligue 1',flag:'FR'},62:{name:'Ligue 2',flag:'FR'},140:{name:'La Liga',flag:'ES'},135:{name:'Serie A',flag:'IT'},78:{name:'Bundesliga',flag:'DE'},88:{name:'Eredivisie',flag:'NL'},141:{name:'Segunda',flag:'ES'},94:{name:'Primeira Liga',flag:'PT'},144:{name:'Pro League',flag:'BE'}};
-const state={today:{fixtures:[],odds:{},analyses:{},loaded:false},tomorrow:{fixtures:[],odds:{},analyses:{},loaded:false}};
+const state={today:{fixtures:[],odds:{},analyses:{},selections:null,loaded:false},tomorrow:{fixtures:[],odds:{},analyses:{},selections:null,loaded:false}};
 let currentDay='today',currentSection='all',expandedId=null;
 
 function getDate(o){o=o||0;var d=new Date();d.setDate(d.getDate()+o);return d.toISOString().split('T')[0];}
 function formatDate(o){o=o||0;var d=new Date();d.setDate(d.getDate()+o);return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}
 function setBar(p){document.getElementById('loadBar').style.width=p+'%';}
 function setInfo(t){document.getElementById('refreshInfo').textContent=t;}
-function reloadCurrent(){state[currentDay].loaded=false;state[currentDay].fixtures=[];state[currentDay].odds={};expandedId=null;loadDay(currentDay);}
+function reloadCurrent(){state[currentDay].loaded=false;state[currentDay].fixtures=[];state[currentDay].odds={};state[currentDay].selections=null;expandedId=null;loadDay(currentDay);}
 
 function showToast(msg){
   var t=document.getElementById('toast');
@@ -451,7 +451,9 @@ function renderContent(){
 async function renderCombos(container,dateLabel){
   var s=state[currentDay];
   if(s.fixtures.length===0){container.innerHTML='<div class="empty">Charge les matchs d\'abord.</div>';return;}
-  container.innerHTML='<div class="loading"><div class="spin"></div><div class="load-text">Génération des combinés par l\'IA...</div></div>';
+  // Utiliser le cache si disponible
+  if(s.selections){renderSelectionsHTML(container,dateLabel,s.selections);return;}
+  container.innerHTML='<div class="loading"><div class="spin"></div><div class="load-text">Analyse des meilleures selections...</div></div>';
   var matches=[];
   s.fixtures.forEach(function(f){
     var o=s.odds[f.fixture.id]||null;
@@ -469,88 +471,79 @@ async function renderCombos(container,dateLabel){
       bestCote:val?val.best.label==='1'?o.home:val.best.label==='X'?o.draw:o.away:null
     });
   });
-  var combos=await getAICombos(matches);
-  if(!combos||combos.length===0){container.innerHTML='<div class="empty">Impossible de générer les combinés. Réessaie.</div>';return;}
+  var selections=await getAISelections(matches);
+  if(!selections||selections.length===0){container.innerHTML='<div class="empty">Impossible de générer les sélections. Réessaie.</div>';return;}
+  state[currentDay].selections=selections;
+  renderSelectionsHTML(container,dateLabel,selections);
+}
+
+function renderSelectionsHTML(container,dateLabel,selections){
   var html='<div class="date-label">'+dateLabel.charAt(0).toUpperCase()+dateLabel.slice(1)+'</div>';
-  combos.forEach(function(combo,i){
-    var coteTotale=1;
-    combo.selections.forEach(function(s){coteTotale*=parseFloat(s.cote)||1;});
-    coteTotale=coteTotale.toFixed(2);
+  html+='<div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--muted2);">'
+    +'<span style="color:var(--green);font-weight:600;">4 meilleures sélections</span> selon l\'IA — construis tes combinés librement'
+    +'</div>';
+  selections.forEach(function(sel,i){
+    var confColor=sel.confiance==='ELEVE'?'var(--green)':sel.confiance==='MODERE'?'var(--amber)':'var(--muted2)';
     html+='<div class="combo-card">'
-      +'<div class="combo-head">'
-      +'<span class="combo-title">Combiné '+(i+1)+'</span>'
-      +'<div style="text-align:right"><div style="font-size:9px;color:var(--muted);font-family:monospace">COTE TOTALE</div><span class="combo-cote-tot">'+coteTotale+'</span></div>'
+      +'<div class="combo-head" style="justify-content:flex-start;gap:10px;">'
+      +'<span style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--amber);">'+(i+1)+'.</span>'
+      +'<div style="flex:1">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text);">'+sel.match+'</div>'
+      +'<div style="font-size:10px;color:var(--muted);margin-top:1px;">'+sel.ligue+' · '+sel.heure+'</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--green);">'+sel.cote+'</div>'
+      +'<div style="font-size:9px;color:'+confColor+';font-weight:600;">'+sel.confiance+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="combo-row" style="border-bottom:none;">'
+      +'<div>'
+      +'<div style="font-size:12px;font-weight:700;color:var(--amber);">'+sel.pari+'</div>'
+      +'<div style="font-size:11px;color:var(--muted2);margin-top:3px;">'+sel.justification+'</div>'
+      +'</div>'
+      +'</div>'
       +'</div>';
-    combo.selections.forEach(function(sel){
-      html+='<div class="combo-row">'
-        +'<div class="combo-match">'+sel.match+'</div>'
-        +'<div style="text-align:right">'
-        +'<div class="combo-sel">'+sel.pari+'</div>'
-        +'<div class="combo-odd">'+sel.cote+'</div>'
-        +'</div>'
-        +'</div>';
-    });
-    html+='<div style="padding:8px 14px;display:flex;justify-content:space-between;align-items:center">'
-      +'<span style="font-size:11px;color:var(--muted2)">'+combo.justification+'</span>'
-      +'<span class="combo-risk">'+combo.risque+'</span>'
-      +'</div>';
-    html+='</div>';
   });
   container.innerHTML=html;
 }
 
-async function getAICombos(matches){
+async function getAISelections(matches){
   var matchList=matches.slice(0,15).map(function(m,i){
-    return (i+1)+'. '+m.home+' vs '+m.away+' ('+m.league+')'
+    return (i+1)+'. '+m.home+' vs '+m.away+' ('+m.league+') a '+m.time
       +'\n   Cotes: 1='+m.cote1+' X='+m.coteX+' 2='+m.cote2
-      +(m.over25?'  +2.5='+m.over25:'')
+      +(m.over15?' +1.5='+m.over15:'')
+      +(m.over25?' +2.5='+m.over25:'')
       +(m.btts?' BTTS='+m.btts:'')
       +'\n   Forme dom: '+m.formHome+' | ext: '+m.formAway
       +(m.edge>0?' | Edge: +'+m.edge+'% sur '+m.bestLabel:'');
   }).join('\n\n');
 
-  var prompt='Tu es un expert en paris sportifs. Reponds UNIQUEMENT en francais et UNIQUEMENT en JSON valide.\n\n'
-    +'Voici les matchs disponibles aujourd\'hui avec leurs cotes:\n\n'+matchList+'\n\n'
-    +'Ta mission: construire 2 combinés de 2 matchs chacun.\n'
-    +'Regles STRICTES:\n'
-    +'- Chaque combiné = exactement 2 matchs\n'
-    +'- La cote de chaque selection doit etre entre 1.40 et 3.50\n'
-    +'- La cote totale du combiné doit etre entre 2.00 et 5.00\n'
-    +'- Choisir les selections les plus fiables selon la forme et les stats\n'
-    +'- Les 2 combinés doivent avoir des matchs DIFFERENTS\n'
-    +'- Le pari peut etre 1X2, +1.5, +2.5 ou BTTS\n\n'
-    +'Reponds UNIQUEMENT avec ce JSON (rien d\'autre, pas de texte avant ou apres):\n'
+  var prompt='Tu es un expert en paris sportifs. Reponds UNIQUEMENT en francais et UNIQUEMENT en JSON valide, sans texte avant ou apres.\n\n'
+    +'Voici les matchs du jour avec leurs cotes:\n\n'+matchList+'\n\n'
+    +'Ta mission: selectionner les 4 MEILLEURS paris de la journee, les plus fiables.\n\n'
+    +'Criteres de selection STRICTS:\n'
+    +'- La cote choisie doit etre entre 1.30 et 3.50 (ni trop basse ni trop haute)\n'
+    +'- Privilegier les matchs avec une forme claire et coherente\n'
+    +'- Le pari peut etre 1X2, +1.5 buts, +2.5 buts ou BTTS\n'
+    +'- Classer par ordre de confiance decroissante (le plus sur en premier)\n\n'
+    +'Reponds UNIQUEMENT avec ce JSON:\n'
     +'[\n'
-    +'  {\n'
-    +'    "selections": [\n'
-    +'      {"match": "Equipe A vs Equipe B", "pari": "Victoire Equipe A (1)", "cote": 1.85},\n'
-    +'      {"match": "Equipe C vs Equipe D", "pari": "+2.5 buts", "cote": 1.72}\n'
-    +'    ],\n'
-    +'    "justification": "Raison courte (1 ligne)",\n'
-    +'    "risque": "FAIBLE"\n'
-    +'  },\n'
-    +'  {\n'
-    +'    "selections": [\n'
-    +'      {"match": "Equipe E vs Equipe F", "pari": "Nul (X)", "cote": 3.20},\n'
-    +'      {"match": "Equipe G vs Equipe H", "pari": "BTTS", "cote": 1.65}\n'
-    +'    ],\n'
-    +'    "justification": "Raison courte (1 ligne)",\n'
-    +'    "risque": "MODERE"\n'
-    +'  }\n'
+    +'  {"match":"Equipe A vs Equipe B","ligue":"Ligue 1","heure":"19:00","pari":"Victoire Equipe A (1)","cote":1.75,"confiance":"ELEVE","justification":"Equipe A en forme WWWWW, adversaire dernier du classement"},\n'
+    +'  {"match":"Equipe C vs Equipe D","ligue":"La Liga","heure":"21:00","pari":"+2.5 buts","cote":1.65,"confiance":"ELEVE","justification":"Les 5 derniers matchs ont produit plus de 3 buts"},\n'
+    +'  {"match":"Equipe E vs Equipe F","ligue":"Bundesliga","heure":"20:30","pari":"Victoire Equipe E (1)","cote":2.10,"confiance":"MODERE","justification":"Domicile solide, adversaire en mauvaise forme"},\n'
+    +'  {"match":"Equipe G vs Equipe H","ligue":"Serie A","heure":"18:00","pari":"BTTS","cote":1.80,"confiance":"MODERE","justification":"Les deux equipes marquent regulierement"}
+'
     +']';
 
   try{
     var r=await fetch('/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
     var d=await r.json();
     var text=d.text||'';
-    // Extraire le JSON de la réponse
-    var jsonMatch=text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-    if(jsonMatch){
-      return JSON.parse(jsonMatch[0]);
-    }
+    var jsonMatch=text.match(/\[\s*\{[\s\S]*?\}\s*\]/);
+    if(jsonMatch){return JSON.parse(jsonMatch[0]);}
     return null;
   }catch(e){
-    console.error('Erreur combinés:',e);
+    console.error('Erreur selections:',e);
     return null;
   }
 }
