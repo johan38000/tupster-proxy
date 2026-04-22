@@ -103,6 +103,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .date-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;padding:4px 0 8px;}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;font-family:'DM Sans',sans-serif;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
+.combo-card{background:var(--s1);border:1px solid var(--amber);border-radius:var(--r);margin-bottom:14px;}
+.combo-head{background:rgba(255,171,0,.08);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);}
+.combo-title{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--amber);letter-spacing:1px;}
+.combo-cote-tot{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green);}
+.combo-row{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.combo-row:last-child{border-bottom:none;}
+.combo-match{font-size:12px;font-weight:600;color:var(--text);flex:1;}
+.combo-sel{font-size:11px;color:var(--amber);font-family:'DM Mono',monospace;text-align:right;}
+.combo-odd{font-size:13px;font-weight:700;color:var(--green);min-width:35px;text-align:right;}
+.combo-risk{font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,230,118,.12);color:var(--green);font-family:'DM Mono',monospace;}
 </style>
 </head>
 <body>
@@ -123,6 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 <div class="tabs">
   <div class="tab active" id="stab-all" onclick="switchSection('all')">Tous</div>
   <div class="tab" id="stab-values" onclick="switchSection('values')">Values</div>
+  <div class="tab" id="stab-combos" onclick="switchSection('combos')">Combinés</div>
   <div class="tab" id="stab-leagues" onclick="switchSection('leagues')">Ligues</div>
 </div>
 <div class="content" id="mainContent">
@@ -380,7 +391,7 @@ async function getAI(fix,odds,val,bestButs){
   var ot=odds?'Cotes 1X2: '+home+' '+odds.home+' / Nul '+odds.draw+' / '+away+' '+odds.away:'Cotes 1X2 indisponibles';
   var vt=val?'Edge value 1X2: '+val.best.edge.toFixed(1)+'% sur '+(val.best.label==='1'?home:val.best.label==='2'?away:'Nul'):'Pas de value 1X2';
   var bt='Marches buts: +1.5='+(odds&&odds.over15?odds.over15:'N/A')+' | +2.5='+(odds&&odds.over25?odds.over25:'N/A')+' | BTTS='+(odds&&odds.btts?odds.btts:'N/A');
-  var prompt='Tu es un expert en paris sportifs francophone. Reponds UNIQUEMENT en français.\n\nMatch: '+home+' vs '+away+' ('+fix.league.name+')\nForme dom: '+(fix.teams.home.form||'N/A')+' | ext: '+(fix.teams.away.form||'N/A')+'\n'+ot+'\n'+vt+'\n'+bt+'\n\nAnalyse en 4 points:\n1. Contexte et forme (2 lignes max)\n2. Recommandation 1X2: quel pari, pourquoi, confiance\n3. Recommandation buts: +1.5, +2.5 ou BTTS - lequel et pourquoi\n4. Synthese: meilleur pari + risque (Faible/Modere/Eleve)\n\nDirect et factuel.';
+  var prompt='Tu es un expert en paris sportifs. Tu combines les competences d\'un analyste professionnel, d\'un data scientist specialise dans les modeles predictifs appliques au sport, et d\'un tippeur experimente. Tu reponds UNIQUEMENT en francais.\n\nMATCH A ANALYSER:\nRencontre: '+home+' vs '+away+' ('+fix.league.name+')\nForme domicile (5 derniers): '+(fix.teams.home.form||'N/A')+' | Forme exterieur (5 derniers): '+(fix.teams.away.form||'N/A')+'\n\nDONNEES DE COTES:\n'+ot+'\n'+vt+'\n'+bt+'\n\nANALYSE EN 4 POINTS (direct, factuel, base sur les donnees):\n\n1. CONTEXTE ET FORME\n- Forme recente des deux equipes\n- Points forts/faibles\n- Enjeu du match (maintien, Europe, titre...)\n\n2. RECOMMANDATION 1X2\n- Pari recommande avec justification precise\n- Probabilite estimee vs cote proposee\n- Confiance: Faible / Modere / Eleve\n\n3. RECOMMANDATION BUTS (+1.5, +2.5 ou BTTS)\n- Marche recommande et pourquoi\n- Base sur les stats de buts\n- Confiance: Faible / Modere / Eleve\n\n4. SYNTHESE\n- Meilleur pari du match\n- Value detectee (oui/non)\n- Risque global: Faible / Modere / Eleve\n\nPas de blabla, uniquement des raisonnements bases sur les donnees.'
   try{
     var r=await fetch('/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
     var d=await r.json();
@@ -390,12 +401,13 @@ async function getAI(fix,odds,val,bestButs){
 }
 
 function switchDay(day){currentDay=day;expandedId=null;document.getElementById('dtab-today').classList.toggle('active',day==='today');document.getElementById('dtab-tomorrow').classList.toggle('active',day==='tomorrow');if(!state[day].loaded)loadDay(day);else renderContent();}
-function switchSection(sec){currentSection=sec;expandedId=null;['all','values','leagues'].forEach(function(s){document.getElementById('stab-'+s).classList.toggle('active',s===sec);});renderContent();}
+function switchSection(sec){currentSection=sec;expandedId=null;['all','values','combos','leagues'].forEach(function(s){document.getElementById('stab-'+s).classList.toggle('active',s===sec);});renderContent();}
 
 function renderContent(){
   var c=document.getElementById('mainContent');
   var s=state[currentDay];
   var dl=formatDate(currentDay==='tomorrow'?1:0);
+  if(currentSection==='combos'){renderCombos(c,dl);return;}
   if(currentSection==='leagues'){
     var bl={};
     s.fixtures.forEach(function(f){
@@ -434,6 +446,113 @@ function renderContent(){
     fx.forEach(function(f){var o=s.odds[f.fixture.id]||null;html+=renderCard(f,o,o?calcValue(o):null,currentDay);});
   }
   c.innerHTML=html;
+}
+
+async function renderCombos(container,dateLabel){
+  var s=state[currentDay];
+  if(s.fixtures.length===0){container.innerHTML='<div class="empty">Charge les matchs d\'abord.</div>';return;}
+  container.innerHTML='<div class="loading"><div class="spin"></div><div class="load-text">Génération des combinés par l\'IA...</div></div>';
+  var matches=[];
+  s.fixtures.forEach(function(f){
+    var o=s.odds[f.fixture.id]||null;
+    if(!o||!o.home)return;
+    var val=calcValue(o);
+    matches.push({
+      home:f.teams.home.name,away:f.teams.away.name,
+      league:f.league.name,
+      time:new Date(f.fixture.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
+      cote1:o.home,coteX:o.draw,cote2:o.away,
+      over15:o.over15||null,over25:o.over25||null,btts:o.btts||null,
+      formHome:f.teams.home.form||'N/A',formAway:f.teams.away.form||'N/A',
+      edge:val?val.best.edge.toFixed(1):0,
+      bestLabel:val?val.best.label:'',
+      bestCote:val?val.best.label==='1'?o.home:val.best.label==='X'?o.draw:o.away:null
+    });
+  });
+  var combos=await getAICombos(matches);
+  if(!combos||combos.length===0){container.innerHTML='<div class="empty">Impossible de générer les combinés. Réessaie.</div>';return;}
+  var html='<div class="date-label">'+dateLabel.charAt(0).toUpperCase()+dateLabel.slice(1)+'</div>';
+  combos.forEach(function(combo,i){
+    var coteTotale=1;
+    combo.selections.forEach(function(s){coteTotale*=parseFloat(s.cote)||1;});
+    coteTotale=coteTotale.toFixed(2);
+    html+='<div class="combo-card">'
+      +'<div class="combo-head">'
+      +'<span class="combo-title">Combiné '+(i+1)+'</span>'
+      +'<div style="text-align:right"><div style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace">COTE TOTALE</div><span class="combo-cote-tot">'+coteTotale+'</span></div>'
+      +'</div>';
+    combo.selections.forEach(function(sel){
+      html+='<div class="combo-row">'
+        +'<div class="combo-match">'+sel.match+'</div>'
+        +'<div style="text-align:right">'
+        +'<div class="combo-sel">'+sel.pari+'</div>'
+        +'<div class="combo-odd">'+sel.cote+'</div>'
+        +'</div>'
+        +'</div>';
+    });
+    html+='<div style="padding:8px 14px;display:flex;justify-content:space-between;align-items:center">'
+      +'<span style="font-size:11px;color:var(--muted2)">'+combo.justification+'</span>'
+      +'<span class="combo-risk">'+combo.risque+'</span>'
+      +'</div>';
+    html+='</div>';
+  });
+  container.innerHTML=html;
+}
+
+async function getAICombos(matches){
+  var matchList=matches.slice(0,15).map(function(m,i){
+    return (i+1)+'. '+m.home+' vs '+m.away+' ('+m.league+')'
+      +'\n   Cotes: 1='+m.cote1+' X='+m.coteX+' 2='+m.cote2
+      +(m.over25?'  +2.5='+m.over25:'')
+      +(m.btts?' BTTS='+m.btts:'')
+      +'\n   Forme dom: '+m.formHome+' | ext: '+m.formAway
+      +(m.edge>0?' | Edge: +'+m.edge+'% sur '+m.bestLabel:'');
+  }).join('\n\n');
+
+  var prompt='Tu es un expert en paris sportifs. Reponds UNIQUEMENT en francais et UNIQUEMENT en JSON valide.\n\n'
+    +'Voici les matchs disponibles aujourd\'hui avec leurs cotes:\n\n'+matchList+'\n\n'
+    +'Ta mission: construire 2 combinés de 2 matchs chacun.\n'
+    +'Regles STRICTES:\n'
+    +'- Chaque combiné = exactement 2 matchs\n'
+    +'- La cote de chaque selection doit etre entre 1.40 et 3.50\n'
+    +'- La cote totale du combiné doit etre entre 2.00 et 5.00\n'
+    +'- Choisir les selections les plus fiables selon la forme et les stats\n'
+    +'- Les 2 combinés doivent avoir des matchs DIFFERENTS\n'
+    +'- Le pari peut etre 1X2, +1.5, +2.5 ou BTTS\n\n'
+    +'Reponds UNIQUEMENT avec ce JSON (rien d\'autre, pas de texte avant ou apres):\n'
+    +'[\n'
+    +'  {\n'
+    +'    "selections": [\n'
+    +'      {"match": "Equipe A vs Equipe B", "pari": "Victoire Equipe A (1)", "cote": 1.85},\n'
+    +'      {"match": "Equipe C vs Equipe D", "pari": "+2.5 buts", "cote": 1.72}\n'
+    +'    ],\n'
+    +'    "justification": "Raison courte (1 ligne)",\n'
+    +'    "risque": "FAIBLE"\n'
+    +'  },\n'
+    +'  {\n'
+    +'    "selections": [\n'
+    +'      {"match": "Equipe E vs Equipe F", "pari": "Nul (X)", "cote": 3.20},\n'
+    +'      {"match": "Equipe G vs Equipe H", "pari": "BTTS", "cote": 1.65}\n'
+    +'    ],\n'
+    +'    "justification": "Raison courte (1 ligne)",\n'
+    +'    "risque": "MODERE"\n'
+    +'  }\n'
+    +']';
+
+  try{
+    var r=await fetch('/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
+    var d=await r.json();
+    var text=d.text||'';
+    // Extraire le JSON de la réponse
+    var jsonMatch=text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+    if(jsonMatch){
+      return JSON.parse(jsonMatch[0]);
+    }
+    return null;
+  }catch(e){
+    console.error('Erreur combinés:',e);
+    return null;
+  }
 }
 
 async function loadDay(day){
